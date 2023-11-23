@@ -25,64 +25,31 @@ def prediction_on_churning(classification_model, input_data):
 
 def preprocess_contract(data):
 
-    if data['Contract'] == 'Month-to-month':
-        data['Contract'] = 0
-    
-    elif data['Contract'] == 'One year':
-        data['Contract'] = 1
-    
-    else :
-        data['Contract'] = 2
+    data['Contract'] = data['Contract'].map({'Month-to-month': 0, 'One year': 1, 'Two year': 2})
 
 def preprocess_payment_method(data):
 
-    if data['PaymentMethod'] == 'Electronic check' :
-        data['PaymentMethod'] = 0
-    
-    elif data['PaymentMethod'] == 'Mailed check':
-        data['PaymentMethod'] = 1
-    
-    elif data['PaymentMethod'] == 'Bank transfer (automatic)':
-        data['PaymentMethod'] = 2
-    
-    else:
-        data['PaymentMethod'] = 3
+    data['PaymentMethod'] = data['PaymentMethod'].map({'Electronic check': 0, 'Mailed check': 1, 'Bank transfer (automatic)': 2, 'Credit card (automatic)': 3})
 
 def preprocess_internet_service(data):
 
-    if data['InternetService'] == 'DSL' :
-        data['InternetService'] = 0
-    
-    elif data['InternetService'] == 'Fiber Optic':
-        data['InternetService'] = 1
-    
-    else:
-        data['InternetService'] = 2
+    data['InternetService'] = data['InternetService'].map({'DSL': 0, 'Fiber optic': 1, 'No': 2})
 
 def preprocess_gender(data):
 
-    if data['gender'] == 'Female':
-        data['gender'] = 0
-    else:
-        data['gender'] = 1
+    data['gender'] = data['gender'].map({'Male': 1, 'Female': 0})
 
 def preprocess_tech_support(data):
 
-    if data['TechSupport'] == 'No':
-        data['TechSupport'] = 0
-    else:
-        data['TechSupport'] = 1
+   data['TechSupport'] = data['TechSupport'].map({'No': 0, 'Yes': 1, 'No internet service': 2})
 
 def preprocess_partner(data):
 
-    if data['Partner'] == 'No':
-        data['Partner'] = 0
-    else:
-        data['Partner'] = 1
+    data['Partner'] = data['Partner'].map({'Yes': 1, 'No': 0})
 
 def preprocess_paperless_billing(data):
 
-    data['PaperlessBilling'] = int(data['PaperlessBilling'])
+    data['PaperlessBilling'] = data['PaperlessBilling'].map({'Yes': 1, 'No': 0})
 
 def preprocess_input_data(data):
     
@@ -124,7 +91,7 @@ def predict():
         internet_service = request.form['internet_service']
         paperless_billing = request.form['paperless_billing']
         gender = request.form['gender']
-        tech_support = request.form['tech_support']
+        tech_support = request.form['TechSupport']
         partner = request.form['partner']
 
 
