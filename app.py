@@ -1,13 +1,12 @@
-import streamlit as st
+from flask import Flask, render_template, request
 import pandas as pd
 from keras.models import load_model
 import pickle
-from pyngrok import ngrok
+
+app = Flask(__name__)
 
 def load_the_model():
-
     classification_model = load_model('Delphine_Churning_Customers_Model.h5')
-    
     return classification_model
 
 def prediction_on_churning(classification_model, input_data):
@@ -109,56 +108,50 @@ def scale_data(data):
 
     return data
 
-def main():
+@app.route('/')
+def home():
+    return render_template('index.html')
 
-    # Set the title of the app
-    st.title("Customer Churn Prediction App")
+@app.route('/predict', methods=['POST'])
+def predict():
+    if request.method == 'POST':
+        # Retrieve form data
+        monthly_charges = float(request.form['monthly_charges'])
+        total_charges = float(request.form['total_charges'])
+        tenure = int(request.form['tenure'])
+        contract = request.form['contract']
+        payment_method = request.form['payment_method']
+        internet_service = request.form['internet_service']
+        paperless_billing = request.form['paperless_billing']
+        gender = request.form['gender']
+        tech_support = request.form['tech_support']
+        partner = request.form['partner']
 
-    # Create input form for user to enter feature values
-    st.header("User Input Features")
 
-    #Create input fields for each feature
-    monthly_charges = st.number_input("Monthly Charges", min_value=0.0, max_value=10000.0, value=0.0)
-    total_charges = st.number_input("Total Charges", min_value=0.0, max_value=100000.0, value=0.0)
-    tenure = st.number_input("Tenure", min_value=0, max_value=100, value=0)
-    contract = st.selectbox("Contract", ["Month-to-month", "One year", "Two year"])
-    payment_method = st.selectbox("Payment Method", ["Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"])
-    internet_service = st.selectbox("Internet Service", ["DSL", "Fiber optic", "No"])
-    paperless_billing = st.checkbox("Paperless Billing")
-    gender = st.selectbox("Gender", ["Male", "Female"])
-    tech_support = st.selectbox("Tech Support", ["Yes", "No"])
-    partner = st.selectbox("Partner", ["Yes", "No"])
-    predict = st.button("Predict")
+        # Create a DataFrame with the input features
+        input_data = pd.DataFrame({
+            'MonthlyCharges': [monthly_charges],
+            'Contract': [contract],
+            'PaymentMethod': [payment_method],
+            'InternetService': [internet_service],
+            'PaperlessBilling': [paperless_billing],
+            'gender': [gender],
+            'TechSupport': [tech_support],
+            'Partner': [partner],
+            'TotalCharges': [total_charges],
+            'tenure': [tenure]
+        })
 
-    # Create a DataFrame with the input features
-    input_data = pd.DataFrame({
-        'MonthlyCharges': [monthly_charges],
-        'Contract': [contract],
-        'PaymentMethod': [payment_method],
-        'InternetService': [internet_service],
-        'PaperlessBilling': [paperless_billing],
-        'gender': [gender],
-        'TechSupport': [tech_support],
-        'Partner': [partner],
-        'TotalCharges': [total_charges],
-        'tenure': [tenure]
-    })
-
-    if predict:
-
+        # Perform preprocessing
         input_data = preprocess_input_data(input_data)
+
+        # Load the model
         model = load_the_model()
+
+        # Make prediction
         prediction = prediction_on_churning(model, input_data)
 
-        st.subheader("Prediction")
-        st.write(f"The custormer {prediction}")
+        return render_template('result.html', prediction=prediction)
 
-# Expose the Streamlit app via ngrok
-public_url = ngrok.connect(port='8501', options={'region': 'us', 'version': '2'})
-
-# Display the public URL in the Colab notebook
-st.write('**Your app is live at:**', public_url)
-
-# Run the Streamlit app
 if __name__ == '__main__':
-    main()
+    app.run(debug=True)
