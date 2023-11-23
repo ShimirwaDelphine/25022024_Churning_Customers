@@ -104,7 +104,7 @@ def scale_data(data):
 
     scaler = pickle.load(open('scaler.pkl', 'rb'))
     numerical_features = ['tenure', 'MonthlyCharges', 'TotalCharges']
-    data[numerical_features] = scaler.transform(data['numerical_features'])
+    data[numerical_features] = scaler.transform(data[numerical_features])
 
     return data
 
