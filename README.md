@@ -27,7 +27,7 @@ Project Components
 
 6. User Interface
 
-- The interface for the user is a website, and it is found here: [https://customerchurnn.streamlit.app/].
+- The web-based interface is found here: [https://customerchurnn.streamlit.app/].
 
 7. Video Demonstration
 
